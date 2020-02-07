@@ -1,3 +1,10 @@
+Version XXX:
+
+* fix doc Jamfile
+* async_base example uses async_initiate
+
+--------------------------------------------------------------------------------
+
 Version 285:
 
 * Translate some win32 errors to net error codes
