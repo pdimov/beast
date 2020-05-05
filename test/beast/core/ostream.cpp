@@ -18,6 +18,8 @@
 #include <boost/beast/_experimental/unit_test/suite.hpp>
 #include <ostream>
 
+#include "v1_dynamic_string_buffer.hpp"
+
 namespace boost {
 namespace beast {
 
@@ -93,9 +95,60 @@ public:
         }
     }
 
+    template<class MakeBuffer>
+    void
+    testOstreamWithV1orV2(MakeBuffer make_buffer)
+    {
+        std::string target;
+        string_view const s = "0123456789abcdef";
+        BEAST_EXPECT(s.size() == 16);
+
+        // overflow
+        {
+            target.clear();
+            ostream(make_buffer(target, 16)) << s;
+            BEAST_EXPECT(target == s);
+        }
+
+        // max_size
+        {
+            target.clear();
+            flat_static_buffer<16> b;
+            auto os = ostream(make_buffer(target, 16));
+            os << s;
+            os << '*';
+            BEAST_EXPECT(os.bad());
+            BEAST_EXPECT(target == s);
+        }
+
+        // max_size (exception
+        {
+            target.clear();
+            auto os = ostream(make_buffer(target, 16));
+            os.exceptions(os.badbit);
+            os << s;
+            try
+            {
+                os << '*';
+                fail("missing exception", __FILE__, __LINE__);
+            }
+            catch(std::ios_base::failure const&)
+            {
+                pass();
+            }
+            catch(...)
+            {
+                fail("wrong exception", __FILE__, __LINE__);
+            }
+        }
+    }
+
+
     void
     run() override
     {
+        testOstreamWithV1orV2([](std::string& s, std::size_t max) { return v1_dynamic_string_buffer(s, max); });
+        testOstreamWithV1orV2([](std::string& s, std::size_t max) { return net::dynamic_buffer(s, max); });
         testOstream();
     }
 };
