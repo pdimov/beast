@@ -1,3 +1,11 @@
+* HTTP Read uses polymorphic buffers.
+* HTTP Write uses polymorphic buffers.
+* WebSocket uses polymorphic buffers.
+* Add polymorphic buffer sequence types.
+* CML permits finding Boost outside the boost build tree.
+
+--------------------------------------------------------------------------------
+
 Version 307:
 
 * Add executor rebind to test::stream.
