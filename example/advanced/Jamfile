@@ -8,6 +8,7 @@
 #
 
 build-project server ;
+build-project server-multi-io-context ;
 
 # SSL
 build-project server-flex ;
